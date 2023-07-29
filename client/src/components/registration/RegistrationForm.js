@@ -101,7 +101,7 @@ const RegistrationForm = () => {
           <label>
             Username
             <input
-              type="string"
+              type="text"
               name="username"
               value={userPayload.username}
               onChange={onInputChange}
