@@ -4,7 +4,7 @@ import config from "../../config";
 
 const RegistrationForm = () => {
   const [userPayload, setUserPayload] = useState({
-    username: "",
+    email: "",
     password: "",
     passwordConfirmation: "",
   });
@@ -15,13 +15,13 @@ const RegistrationForm = () => {
 
   const validateInput = (payload) => {
     setErrors({});
-    const { username, password, passwordConfirmation } = payload;
-    const usernameRegexp = config.validation.username.regexp;
+    const { email, password, passwordConfirmation } = payload;
+    const emailRegexp = config.validation.email.regexp;
     let newErrors = {};
-    if (!username.match(usernameRegexp)) {
+    if (!email.match(emailRegexp)) {
       newErrors = {
         ...newErrors,
-        username: "is invalid",
+        email: "is invalid",
       };
     }
 
@@ -91,7 +91,7 @@ const RegistrationForm = () => {
       <form onSubmit={onSubmit}>
         <div>
           <label>
-            Username
+            Email
             <input type="text" name="email" value={userPayload.email} onChange={onInputChange} />
             <FormError error={errors.email} />
           </label>
