@@ -8,7 +8,7 @@
 exports.up = async (knex) => {
     return knex.schema.createTable("prompts", (table) => {
         table.bigIncrements("id")
-        table.text("promptBody").notNullable()
+        table.string("promptBody").notNullable()
         table.timestamp("createdAt").notNullable().defaultTo(knex.fn.now())
         table.timestamp("updatedAt").notNullable().defaultTo(knex.fn.now())
     })
