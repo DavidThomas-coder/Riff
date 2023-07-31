@@ -10,7 +10,7 @@ class Prompt extends Model {
             type: "object",
             required: ["promptBody"],
             properties: {
-                promptBody: { type: "text" }
+                promptBody: { type: "string" }
             }
         }
     }
