@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import SignOutButton from "../authentication/SignOutButton";
+import UserProfile from "../UserProfile";
 
 const TopBar = ({ user }) => {
   const unauthenticatedListItems = [
@@ -15,6 +16,9 @@ const TopBar = ({ user }) => {
   ];
 
   const authenticatedListItems = [
+    <li key="user-profile-button">
+      <Link to="/profile">Your Profile</Link>
+    </li>,
     <li key="sign-out">
       <SignOutButton />
     </li>,
