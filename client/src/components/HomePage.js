@@ -6,60 +6,44 @@ const HomePage = () => {
     const [submittedAnswer, setSubmittedAnswer] = useState("");
 
     useEffect(() => {
-        // Fetch a random prompt from the backend API
-        const fetchRandomPrompt = async () => {
-        try {
-            const response = await fetch("/api/v1/prompts"); // Replace "/api/prompts" with the actual endpoint URL for fetching prompts
-            if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
-            }
-            const body = await response.json();
-            const promptsFromBackend = body.prompts;
-            console.log("Prompts from the backend:", body.prompts)
+        // Fetch the daily prompt from the backend API
+        const fetchDailyPrompt = async () => {
+            try {
+                const response = await fetch("/api/v1/prompts"); // Update the endpoint URL to match the backend "/daily" endpoint
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+                const body = await response.json();
+                const dailyPrompt = body.prompt;
+                console.log("Daily prompt from the backend:", dailyPrompt);
 
-            if (promptsFromBackend && promptsFromBackend.length > 0) {
-            // If prompts were retrieved successfully, choose a random prompt from the fetched prompts
-            const randomIndex = Math.floor(Math.random() * promptsFromBackend.length);
-            setPrompt(promptsFromBackend[randomIndex].promptBody);
-            } else {
-            // If no prompts were retrieved or an error occurred, fallback to a daily prompt from the frontend list
-            const dailyPrompts = [
-                "Describe your first date.",
-                "What's your favorite story to tell at family gatherings? It could be one you've told 100 times.",
-                "What's the most embarrassing thing to happen to you recently?",
-                "If you could have any superpower, what would it be?",
-                // Add more prompts here...
-            ];
-            const randomIndex = Math.floor(Math.random() * dailyPrompts.length);
-            setPrompt(dailyPrompts[randomIndex]);
+                if (dailyPrompt) {
+                    setPrompt(dailyPrompt);
+                } else {
+                    // If no prompt was retrieved or an error occurred, fallback to a default prompt
+                    const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+                    setPrompt(defaultPrompt);
+                }
+            } catch (error) {
+                // If an error occurs while fetching the daily prompt, fallback to a default prompt
+                console.error("Error fetching the daily prompt:", error);
+                const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+                setPrompt(defaultPrompt);
             }
-        } catch (error) {
-            // If an error occurs while fetching prompts, fallback to a daily prompt from the frontend list
-            console.error("Error fetching prompts:", error);
-            const dailyPrompts = [
-            "Describe your first date.",
-            "What's your favorite story to tell at family gatherings? It could be one you've told 100 times.",
-            "What's the most embarrassing thing to happen to you recently?",
-            "If you could have any superpower, what would it be?",
-            // Add more prompts here...
-            ];
-            const randomIndex = Math.floor(Math.random() * dailyPrompts.length);
-            setPrompt(dailyPrompts[randomIndex]);
-        }
         };
 
-        // Call the fetchRandomPrompt function to retrieve a random prompt when the component mounts
-        fetchRandomPrompt();
+        // Call the fetchDailyPrompt function to retrieve the daily prompt when the component mounts
+        fetchDailyPrompt();
 
-        // Set up interval to fetch prompts daily at midnight (UTC)
+        // Set up interval to fetch the daily prompt daily at midnight (UTC)
         const midnight = new Date();
         midnight.setUTCHours(24, 0, 0, 0); // Set time to midnight UTC
         const timeUntilMidnight = midnight - Date.now();
-        const dailyUpdateInterval = setInterval(fetchRandomPrompt, timeUntilMidnight);
+        const dailyUpdateInterval = setInterval(fetchDailyPrompt, timeUntilMidnight);
 
         // Clean up the interval when the component unmounts
         return () => {
-        clearInterval(dailyUpdateInterval);
+            clearInterval(dailyUpdateInterval);
         };
     }, []);
 
@@ -72,34 +56,33 @@ const HomePage = () => {
 
     return (
         <div>
-        <h1>It's time to Riff!</h1>
-        <p>Prompt: {prompt}</p>
+            <h1>It's time to Riff!</h1>
+            <p>Prompt: {prompt}</p>
 
-        {/* Form to answer the prompt */}
-        <form onSubmit={handleSubmit}>
-            <label>
-            Your Answer:
-            <input
-                type="text"
-                value={userAnswer}
-                onChange={(event) => setUserAnswer(event.target.value)}
-            />
-            </label>
-            <button type="submit">Submit</button>
-        </form>
+            {/* Form to answer the prompt */}
+            <form onSubmit={handleSubmit}>
+                <label>
+                    Your Answer:
+                    <input
+                        type="text"
+                        value={userAnswer}
+                        onChange={(event) => setUserAnswer(event.target.value)}
+                    />
+                </label>
+                <button type="submit">Submit</button>
+            </form>
 
-        {/* Display the user's submitted answer */}
-        {submittedAnswer && (
-            <div>
-            <p>Your Answer:</p>
-            <p>{submittedAnswer}</p>
-            </div>
-        )}
+            {/* Display the user's submitted answer */}
+            {submittedAnswer && (
+                <div>
+                    <p>Your Answer:</p>
+                    <p>{submittedAnswer}</p>
+                </div>
+            )}
 
-        {/* Your other content */}
+            {/* Your other content */}
         </div>
     );
 };
 
 export default HomePage;
-
