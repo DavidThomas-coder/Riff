@@ -5,36 +5,56 @@ const HomePage = () => {
     const [userAnswer, setUserAnswer] = useState("");
     const [submittedAnswer, setSubmittedAnswer] = useState("");
 
-    // Example list of daily prompts
-    const dailyPrompts = [
-        "Describe your first date.",
-        "What's your favorite story to tell at family gatherings? It could be one you've told 100 times.",
-        "What's the most embarrassing thing to happen to you recently?",
-        "If you could have any superpower, what would it be?",
-        // Add more prompts here...
-    ];
-
-    // Function to get a random prompt from the dailyPrompts list
-    const getRandomPrompt = () => {
-        const randomIndex = Math.floor(Math.random() * dailyPrompts.length);
-        return dailyPrompts[randomIndex];
-    };
-
     useEffect(() => {
-        // Update the prompt daily when the component mounts and at midnight
-        const updateDailyPrompt = () => {
-        const newPrompt = getRandomPrompt();
-        setPrompt(newPrompt);
+        // Fetch a random prompt from the backend API
+        const fetchRandomPrompt = async () => {
+        try {
+            const response = await fetch("/api/v1/prompts"); // Replace "/api/prompts" with the actual endpoint URL for fetching prompts
+            if (!response.ok) {
+            throw new Error(`${response.status} (${response.statusText})`);
+            }
+            const body = await response.json();
+            const promptsFromBackend = body.prompts;
+
+            if (promptsFromBackend && promptsFromBackend.length > 0) {
+            // If prompts were retrieved successfully, choose a random prompt from the fetched prompts
+            const randomIndex = Math.floor(Math.random() * promptsFromBackend.length);
+            setPrompt(promptsFromBackend[randomIndex].content);
+            } else {
+            // If no prompts were retrieved or an error occurred, fallback to a daily prompt from the frontend list
+            const dailyPrompts = [
+                "Describe your first date.",
+                "What's your favorite story to tell at family gatherings? It could be one you've told 100 times.",
+                "What's the most embarrassing thing to happen to you recently?",
+                "If you could have any superpower, what would it be?",
+                // Add more prompts here...
+            ];
+            const randomIndex = Math.floor(Math.random() * dailyPrompts.length);
+            setPrompt(dailyPrompts[randomIndex]);
+            }
+        } catch (error) {
+            // If an error occurs while fetching prompts, fallback to a daily prompt from the frontend list
+            console.error("Error fetching prompts:", error);
+            const dailyPrompts = [
+            "Describe your first date.",
+            "What's your favorite story to tell at family gatherings? It could be one you've told 100 times.",
+            "What's the most embarrassing thing to happen to you recently?",
+            "If you could have any superpower, what would it be?",
+            // Add more prompts here...
+            ];
+            const randomIndex = Math.floor(Math.random() * dailyPrompts.length);
+            setPrompt(dailyPrompts[randomIndex]);
+        }
         };
 
-        // Update the prompt when the component mounts
-        updateDailyPrompt();
+        // Call the fetchRandomPrompt function to retrieve a random prompt when the component mounts
+        fetchRandomPrompt();
 
-        // Set up interval to update the prompt daily at midnight (UTC)
+        // Set up interval to fetch prompts daily at midnight (UTC)
         const midnight = new Date();
         midnight.setUTCHours(24, 0, 0, 0); // Set time to midnight UTC
         const timeUntilMidnight = midnight - Date.now();
-        const dailyUpdateInterval = setInterval(updateDailyPrompt, timeUntilMidnight);
+        const dailyUpdateInterval = setInterval(fetchRandomPrompt, timeUntilMidnight);
 
         // Clean up the interval when the component unmounts
         return () => {
