@@ -7,6 +7,7 @@ import "../assets/scss/main.scss";
 import RegistrationForm from "./registration/RegistrationForm";
 import SignInForm from "./authentication/SignInForm";
 import TopBar from "./layout/TopBar";
+import HomePage from "./HomePage";
 
 import AuthenticatedRoute from "./authentication/AuthenticatedRoute";
 import UserProfile from "./UserProfile";
@@ -31,7 +32,7 @@ const App = (props) => {
       <TopBar user={currentUser} />
       <Switch>
         <Route exact path="/">
-          <h2>It's time to RIFF!</h2>
+          <HomePage />
         </Route>
         <Route exact path="/users/new" component={RegistrationForm} />
         <Route exact path="/user-sessions/new" component={SignInForm} />
