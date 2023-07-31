@@ -15,11 +15,12 @@ const HomePage = () => {
             }
             const body = await response.json();
             const promptsFromBackend = body.prompts;
+            console.log("Prompts from the backend:", body.prompts)
 
             if (promptsFromBackend && promptsFromBackend.length > 0) {
             // If prompts were retrieved successfully, choose a random prompt from the fetched prompts
             const randomIndex = Math.floor(Math.random() * promptsFromBackend.length);
-            setPrompt(promptsFromBackend[randomIndex].content);
+            setPrompt(promptsFromBackend[randomIndex].promptBody);
             } else {
             // If no prompts were retrieved or an error occurred, fallback to a daily prompt from the frontend list
             const dailyPrompts = [
