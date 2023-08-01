@@ -57,16 +57,18 @@ const HomePage = () => {
     return (
         <div>
             <h1>It's time to Riff!</h1>
-            <p>Prompt: {prompt}</p>
 
             {/* Form to answer the prompt */}
             <form onSubmit={handleSubmit}>
                 <label>
+                    <p>{prompt}</p>
+                </label>
+                <label>
                     Your Answer:
                     <input
-                        type="text"
-                        value={userAnswer}
-                        onChange={(event) => setUserAnswer(event.target.value)}
+                    type="text"
+                    value={userAnswer}
+                    onChange={(event) => setUserAnswer(event.target.value)}
                     />
                 </label>
                 <button type="submit">Submit</button>
@@ -74,10 +76,10 @@ const HomePage = () => {
 
             {/* Display the user's submitted answer */}
             {submittedAnswer && (
-                <div>
-                    <p>Your Answer:</p>
-                    <p>{submittedAnswer}</p>
-                </div>
+            <div>
+                <p>Your Answer:</p>
+                <p>{submittedAnswer}</p>
+            </div>
             )}
 
             {/* Your other content */}
