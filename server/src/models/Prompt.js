@@ -15,6 +15,20 @@ class Prompt extends Model {
         }
     }
 
+    static get relationMappings() {
+        const { Riff } = require("./index.js")
+        return {
+            prompts: {
+                relation: Model.HasManyRelation,
+                modelClass: Prompt,
+                join: {
+                    from: "prompts.id",
+                    to: "riffs.promptId"
+                }
+            }
+        }
+    }
+
 }
 
 module.exports = Prompt

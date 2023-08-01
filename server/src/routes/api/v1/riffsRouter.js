@@ -13,13 +13,17 @@ riffsRouter.get("/", async (req, res) => {
         }
 });
 
-// Endpoint to save a riff
 riffsRouter.post("/", async (req, res) => {
     try {
-        const { riffBody } = req.body;
-        const riff = await Riff.query().insert({ riffBody });
+        const { riffBody, userId } = req.body;
+        console.log("req.body is:", req.body)
+        // const userId = req.user.userId; // Assuming the authenticated user's ID is available in req.user
+    
+        // Insert the riff with the associated userId
+        const riff = await Riff.query().insert({ riffBody, userId });
+    
         return res.status(201).json({ riff });
-    } catch (error) {
+        } catch (error) {
         console.error("Error saving riff:", error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
