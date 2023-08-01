@@ -6,46 +6,46 @@ const HomePage = (props) => {
     const [submittedAnswer, setSubmittedAnswer] = useState("");
 
     useEffect(() => {
-        // Fetch the daily prompt from the backend API
-        const fetchDailyPrompt = async () => {
+        // Fetch the current prompt from the backend API
+        const fetchCurrentPrompt = async () => {
             try {
-                const response = await fetch("/api/v1/prompts"); // Update the endpoint URL to match the backend "/daily" endpoint
+                const response = await fetch("/api/v1/prompts/current");
                 if (!response.ok) {
                     throw new Error(`${response.status} (${response.statusText})`);
                 }
-                const body = await response.json();
-                const dailyPrompt = body.prompt;
-                console.log("Daily prompt from the backend:", dailyPrompt);
-
-                if (dailyPrompt) {
-                    setPrompt(dailyPrompt);
+                const { prompt: [currentPrompt] } = await response.json();
+                console.log("Current prompt from the backend:", currentPrompt);
+    
+                if (currentPrompt) {
+                    setPrompt(currentPrompt.promptBody); // Assuming the prompt text is stored in a "promptBody" property
                 } else {
-                    // If no prompt was retrieved or an error occurred, fallback to a default prompt
+                    // If no current prompt is available (e.g., server restart or before the first midnight update), fallback to a default prompt
                     const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
                     setPrompt(defaultPrompt);
                 }
             } catch (error) {
-                // If an error occurs while fetching the daily prompt, fallback to a default prompt
-                console.error("Error fetching the daily prompt:", error);
+                // If an error occurs while fetching the current prompt, fallback to a default prompt
+                console.error("Error fetching the current prompt:", error);
                 const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
                 setPrompt(defaultPrompt);
             }
         };
-
-        // Call the fetchDailyPrompt function to retrieve the daily prompt when the component mounts
-        fetchDailyPrompt();
-
-        // Set up interval to fetch the daily prompt daily at midnight (UTC)
+    
+        // Call the fetchCurrentPrompt function to retrieve the current prompt when the component mounts
+        fetchCurrentPrompt();
+    
+        // Set up interval to refetch the current prompt daily at midnight (UTC)
         const midnight = new Date();
         midnight.setUTCHours(24, 0, 0, 0); // Set time to midnight UTC
         const timeUntilMidnight = midnight - Date.now();
-        const dailyUpdateInterval = setInterval(fetchDailyPrompt, timeUntilMidnight);
-
+        const dailyUpdateInterval = setInterval(fetchCurrentPrompt, timeUntilMidnight);
+    
         // Clean up the interval when the component unmounts
         return () => {
             clearInterval(dailyUpdateInterval);
         };
     }, []);
+    
 
 // Function to handle form submission
 const handleSubmit = async (event) => {
