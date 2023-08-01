@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const HomePage = () => {
+const HomePage = (props) => {
     const [prompt, setPrompt] = useState("");
     const [userAnswer, setUserAnswer] = useState("");
     const [submittedAnswer, setSubmittedAnswer] = useState("");
@@ -47,34 +47,43 @@ const HomePage = () => {
         };
     }, []);
 
-    // Function to handle form submission
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        try {
-            const response = await fetch("/api/v1/riffs", {
-                method: "POST",
-                headers: {
-                "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ riffBody: userAnswer }), // Send the user's answer as JSON
-            });
-        
-            if (!response.ok) {
-                throw new Error(`${response.status} (${response.statusText})`);
-            }
-        
-            const data = await response.json();
-            // Assuming the response data contains the saved riff object with an "id" field
-            const { id } = data.riff;
-            console.log(`Riff with ID ${id} saved successfully!`);
-        
-            // Clear the user's answer after submission
-            setSubmittedAnswer(userAnswer);
-            setUserAnswer("");
-            } catch (error) {
-            console.error("Error saving riff:", error);
+// Function to handle form submission
+const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      // Ensure the userId is available and set correctly in state
+        if (!props.user || !props.user.id) {
+            console.error("Error: userId not available");
+            return;
         }
-    };
+
+        // Logging the userId to check its value
+        console.log("UserId:", props.user.id);
+    
+        const response = await fetch("/api/v1/riffs", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ riffBody: userAnswer, userId: props.user.id }), // Include the userId in the request payload
+        });
+    
+        if (!response.ok) {
+            throw new Error(`${response.status} (${response.statusText})`);
+        }
+    
+        const data = await response.json();
+        // Assuming the response data contains the saved riff object with an "id" field
+        const { id } = data.riff;
+        console.log(`Riff with ID ${id} saved successfully!`);
+    
+        // Clear the user's answer after submission
+        setSubmittedAnswer(userAnswer);
+        setUserAnswer("");
+        } catch (error) {
+        console.error("Error saving riff:", error);
+    }
+};  
 
     return (
         <div>
