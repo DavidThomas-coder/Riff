@@ -48,10 +48,32 @@ const HomePage = () => {
     }, []);
 
     // Function to handle form submission
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        setSubmittedAnswer(userAnswer);
-        setUserAnswer("");
+        try {
+            const response = await fetch("/api/v1/riffs", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ riffBody: userAnswer }), // Send the user's answer as JSON
+            });
+        
+            if (!response.ok) {
+                throw new Error(`${response.status} (${response.statusText})`);
+            }
+        
+            const data = await response.json();
+            // Assuming the response data contains the saved riff object with an "id" field
+            const { id } = data.riff;
+            console.log(`Riff with ID ${id} saved successfully!`);
+        
+            // Clear the user's answer after submission
+            setSubmittedAnswer(userAnswer);
+            setUserAnswer("");
+            } catch (error) {
+            console.error("Error saving riff:", error);
+        }
     };
 
     return (
