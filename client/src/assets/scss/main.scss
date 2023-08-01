@@ -1,7 +1,8 @@
 @import "./foundation/settings";
 @import "~foundation-sites/scss/foundation";
 @include foundation-everything;
-// place global css here
+
+/* Global styles */
 *,
 *::before,
 *::after {
@@ -12,3 +13,66 @@
   -moz-tab-size: 4;
   tab-size: 4;
 }
+
+/* Black background and white text */
+body {
+  background-color: black;
+  color: white;
+}
+
+/* Red color scheme */
+/* You can customize these color values to suit your preferences */
+a {
+  color: #ff0000; /* Red color for links */
+}
+
+button {
+  background-color: #ff0000; /* Red background for buttons */
+  color: white; /* White text for buttons */
+}
+
+/* Styling for the form */
+form {
+  background-color: darkgrey; /* Dark grey background for the form */
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px; /* Set the maximum width for the form */
+  margin: 0 auto; /* Center the form horizontally */
+}
+
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+input[type="text"] {
+  width: 100%;
+  height: 5em; /* Set the height to 5 lines (5em) */
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid white;
+  border-radius: 4px;
+  background-color: darkgrey; /* Dark grey background for the input field */
+  color: rgb(0, 0, 0); /* White text for the input field */
+  resize: none; /* Disable textarea resizing */
+  vertical-align: text-top; /* Align the text to the top of the input field */
+  line-height: 1.5; /* Set the line height for the input text */
+}
+
+button[type="submit"] {
+  background-color: #ff0000; /* Red background for the submit button */
+  color: white; /* White text for the submit button */
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  background-color: #cc0000; /* Darker red background on hover */
+}
+
+/* Add more styles here for other elements in your application */
