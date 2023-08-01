@@ -3,56 +3,62 @@ import { Prompt } from "../../../models/index.js";
 
 const promptsRouter = new express.Router();
 
+let currentPrompt = null;
+let promptTimestamp = null;
+
+function updateDailyPrompt() {
+    // Fetch a new random prompt from the database
+    // Assuming the following query function returns a random prompt object
+    // Replace "Prompt" with the actual name of your prompt model
+    Prompt.query()
+        .orderByRaw("RANDOM()")
+        .limit(1)
+        .then((randomPrompt) => {
+            if (!randomPrompt) {
+                console.error("Error fetching random prompt: No prompts found");
+                return;
+            }
+
+            // Update the current prompt and timestamp
+            currentPrompt = randomPrompt;
+            promptTimestamp = Date.now();
+        })
+        .catch((error) => {
+            console.error("Error fetching random prompt:", error);
+        });
+}
+
+// Call the function to update the prompt on server start
+updateDailyPrompt();
+
+// Set up interval to update the prompt daily at midnight (UTC)
+const midnight = new Date();
+midnight.setUTCHours(24, 0, 0, 0); // Set time to midnight UTC
+const timeUntilMidnight = midnight - Date.now();
+setInterval(() => {
+    updateDailyPrompt();
+}, timeUntilMidnight);
+
 promptsRouter.get("/", async (req, res) => {
     try {
         const allPrompts = await Prompt.query();
         return res.status(200).json({ prompts: allPrompts });
-        } catch (error) {
+    } catch (error) {
         console.error("Error fetching all prompts:", error);
         return res.status(500).json({ error: "Internal Server Error" });
-        }
+    }
 });
 
-// let dailyPrompt = null; // Variable to store the daily prompt
-
-// const fetchDailyPrompt = async () => {
-//     try {
-//         // If the daily prompt is already set, return it
-//         if (dailyPrompt) {
-//         return dailyPrompt;
-//         }
-
-//         // If the daily prompt is not set, fetch a random prompt from the database
-//         const allPrompts = await Prompt.query();
-//         if (allPrompts && allPrompts.length > 0) {
-//         const randomIndex = Math.floor(Math.random() * allPrompts.length);
-//         dailyPrompt = allPrompts[randomIndex].promptBody;
-//         return dailyPrompt;
-//         }
-
-//         // If there are no prompts in the database, return a default prompt
-//         const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-//         dailyPrompt = defaultPrompt;
-//         return dailyPrompt;
-//     } catch (error) {
-//         console.error("Error fetching prompts:", error);
-//         // If an error occurs while fetching prompts, return a default prompt
-//         const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-//         dailyPrompt = defaultPrompt;
-//         return dailyPrompt;
-//     }
-//     };
-
-//     promptsRouter.get("/", async (req, res) => {
-//     try {
-//         const prompt = await fetchDailyPrompt();
-//         return res.status(200).json({ prompt });
-//     } catch (error) {
-//         console.error("Error fetching daily prompt:", error);
-//         return res.status(500).json({ error: "Internal Server Error" });
-//     }
-// });
+promptsRouter.get("/current", (req, res) => {
+    // Return the current prompt if available, or an empty response if no prompt has been set yet
+    if (currentPrompt && promptTimestamp) {
+        return res.status(200).json({ prompt: currentPrompt });
+    } else {
+        return res.status(204).send(); // No Content
+    }
+});
 
 export default promptsRouter;
+
 
 
