@@ -1,5 +1,5 @@
-const express = require("express");
-const Riff = require("../models/Riff");
+import express from "express"
+import { Riff } from "../../../models/index.js";
 
 const riffsRouter = express.Router();
 
@@ -15,4 +15,4 @@ riffsRouter.post("/", async (req, res) => {
     }
 });
 
-module.exports = riffsRouter;
+export default riffsRouter

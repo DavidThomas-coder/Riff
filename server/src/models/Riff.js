@@ -10,7 +10,7 @@ class Riff extends Model {
             type: "object",
             required: ["riffBody"],
             properties: {
-                riffBody: { type: "text" }
+                riffBody: { type: "string" }
             }
         }
     }
