@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 
 const HomePage = (props) => {
-    const [prompt, setPrompt] = useState("");
-    const [promptId, setPromptId] = useState(null);
-    const [userAnswer, setUserAnswer] = useState("");
-    const [submittedAnswer, setSubmittedAnswer] = useState("");
+    const [homepage, setHomepage] = useState({
+        prompt: "",
+        promptId: null,
+        userAnswer: "",
+        submittedAnswer: ""
+    });
 
     useEffect(() => {
         // Fetch the current prompt from the backend API
@@ -18,18 +20,21 @@ const HomePage = (props) => {
                 console.log("Current prompt from the backend:", currentPrompt);
 
                 if (currentPrompt) {
-                    setPrompt(currentPrompt.promptBody); // Assuming the prompt text is stored in a "promptBody" property
-                    setPromptId(currentPrompt.id); // Assuming the prompt ID is stored in an "id" property
+                    setHomepage({
+                        ...homepage,
+                        prompt: currentPrompt.promptBody,
+                        promptId: currentPrompt.id
+                    });
                 } else {
                     // If no current prompt is available (e.g., server restart or before the first midnight update), fallback to a default prompt
                     const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-                    setPrompt(defaultPrompt);
+                    setHomepage({ ...homepage, prompt: defaultPrompt });
                 }
             } catch (error) {
                 // If an error occurs while fetching the current prompt, fallback to a default prompt
                 console.error("Error fetching the current prompt:", error);
                 const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-                setPrompt(defaultPrompt);
+                setHomepage({ ...homepage, prompt: defaultPrompt });
             }
         };
 
@@ -66,7 +71,7 @@ const HomePage = (props) => {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ riffBody: userAnswer, userId: props.user.id, promptId }), // Include the userId and promptId in the request payload
+                body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }), // Include the userId and promptId in the request payload
             });
 
             if (!response.ok) {
@@ -79,8 +84,7 @@ const HomePage = (props) => {
             console.log(`Riff with ID ${id} saved successfully!`);
 
             // Clear the user's answer after submission
-            setSubmittedAnswer(userAnswer);
-            setUserAnswer("");
+            setHomepage({ ...homepage, submittedAnswer: homepage.userAnswer, userAnswer: "" });
         } catch (error) {
             console.error("Error saving riff:", error);
         }
@@ -93,24 +97,24 @@ const HomePage = (props) => {
             {/* Form to answer the prompt */}
             <form onSubmit={handleSubmit}>
                 <label>
-                    <p>{prompt}</p>
+                    <p>{homepage.prompt}</p>
                 </label>
                 <label>
                     Your Answer:
                     <input
                         type="text"
-                        value={userAnswer}
-                        onChange={(event) => setUserAnswer(event.target.value)}
+                        value={homepage.userAnswer}
+                        onChange={(event) => setHomepage({ ...homepage, userAnswer: event.target.value })}
                     />
                 </label>
                 <button type="submit">Submit</button>
             </form>
 
             {/* Display the user's submitted answer */}
-            {submittedAnswer && (
+            {homepage.submittedAnswer && (
                 <div>
                     <p>Your Answer:</p>
-                    <p>{submittedAnswer}</p>
+                    <p>{homepage.submittedAnswer}</p>
                 </div>
             )}
 
