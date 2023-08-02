@@ -76,3 +76,28 @@ button[type="submit"]:hover {
 }
 
 /* Add more styles here for other elements in your application */
+
+.other-riff-tile {
+  background-color: #f9f9f9; /* Gray background */
+  border: 2px solid #ff4500; /* Red border */
+  padding: 10px; /* Add some padding around the content */
+  margin: 10px 0; /* Add some margin between tiles */
+  color: #000000; /* Black text */
+  font-family: Arial, sans-serif; /* Choose your desired font */
+}
+
+.username {
+  font-weight: bold; /* Make the username text bold */
+}
+
+/* UserRiffTile.css */
+
+.user-riff-tile {
+  background-color: darkgrey; /* Dark gray background */
+  padding: 10px; /* Add some padding around the content */
+  color: #000000; /* Black text */
+  font-family: Arial, sans-serif; /* Choose your desired font */
+  margin-top: 20px; /* Add margin at the top to create space between components */
+  margin-left: 20px;
+  margin-right: 20px;
+}
