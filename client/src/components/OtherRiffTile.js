@@ -1,10 +1,34 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
-const OtherRiffTile = ({ riff }) => {
+const OtherRiffTile = ({ riff, userId }) => {
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+        console.log("Received userId:", userId); // Log the userId to verify if it's correct
+        const fetchUsername = async () => {
+        try {
+            // Fetch the username from the backend using the userId
+            const response = await fetch(`/api/v1/users/${userId}`);
+            if (!response.ok) {
+            throw new Error(`${response.status} (${response.statusText})`);
+            }
+            const { username } = await response.json();
+            console.log("Username for user ID", userId, ":", username);
+            setUsername(username);
+        } catch (error) {
+            // If an error occurs while fetching the username, handle it gracefully
+            console.error("Error fetching the username:", error);
+        }
+        };
+
+        // Call the fetchUsername function when the component mounts
+        fetchUsername();
+    }, [userId]);
+
     return (
         <div className="other-riff-tile">
-            <p>Other User's Riff:</p>
-            <p>{riff}</p>
+        <p>{username}'s Riff:</p>
+        <p>{riff}</p>
         </div>
     );
 };
