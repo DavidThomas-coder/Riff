@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import RiffTile from "./RiffTile";
 
 const HomePage = (props) => {
     const [homepage, setHomepage] = useState({
@@ -110,13 +111,8 @@ const HomePage = (props) => {
                 <button type="submit">Submit</button>
             </form>
 
-            {/* Display the user's submitted answer */}
-            {homepage.submittedAnswer && (
-                <div>
-                    <p>Your Answer:</p>
-                    <p>{homepage.submittedAnswer}</p>
-                </div>
-            )}
+            {/* Display the user's submitted answer using RiffTile component */}
+            {homepage.submittedAnswer && <RiffTile submittedAnswer={homepage.submittedAnswer} />}
 
             {/* Your other content */}
         </div>
