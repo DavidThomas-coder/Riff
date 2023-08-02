@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import RiffTile from "./RiffTile";
+import RiffForm from "./RiffForm";
 
 const HomePage = (props) => {
     const [homepage, setHomepage] = useState({
@@ -95,21 +96,13 @@ const HomePage = (props) => {
         <div>
             <h1>It's time to Riff!</h1>
 
-            {/* Form to answer the prompt */}
-            <form onSubmit={handleSubmit}>
-                <label>
-                    <p>{homepage.prompt}</p>
-                </label>
-                <label>
-                    Your Answer:
-                    <input
-                        type="text"
-                        value={homepage.userAnswer}
-                        onChange={(event) => setHomepage({ ...homepage, userAnswer: event.target.value })}
-                    />
-                </label>
-                <button type="submit">Submit</button>
-            </form>
+            {/* Form to answer the prompt using RiffForm component */}
+            <RiffForm
+                prompt={homepage.prompt}
+                userAnswer={homepage.userAnswer}
+                onUserAnswerChange={(event) => setHomepage({ ...homepage, userAnswer: event.target.value })}
+                onSubmit={handleSubmit}
+            />
 
             {/* Display the user's submitted answer using RiffTile component */}
             {homepage.submittedAnswer && <RiffTile submittedAnswer={homepage.submittedAnswer} />}
