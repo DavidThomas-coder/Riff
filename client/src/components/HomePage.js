@@ -51,7 +51,7 @@ const HomePage = (props) => {
             throw new Error(`${response.status} (${response.statusText})`);
             }
 
-            const { riff } = await response.json();
+            const { riff }  = await response.json();
             console.log("User's submitted riff from the backend:", riff);
 
             if (riff && riff.riffBody) {
@@ -101,8 +101,22 @@ const HomePage = (props) => {
         };
     }, [props.user]);
 
+    const handleUserAnswerChange = (event) => {
+        setHomepage((prevHomepage) => ({
+            ...prevHomepage,
+            userAnswer: event.target.value,
+        }));
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
+
+        console.log("Data to be sent to the backend:", {
+            riffBody: homepage.userAnswer,
+            userId: props.user.id,
+            promptId: homepage.promptId,
+          });
+
         try {
         if (!props.user || !props.user.id) {
             console.error("Error: userId not available");
@@ -119,11 +133,13 @@ const HomePage = (props) => {
             body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
         });
 
+
         if (!response.ok) {
             throw new Error(`${response.status} (${response.statusText})`);
         }
 
         const data = await response.json();
+        console.log("RESPONSE:", data)
         const { id } = data.riff;
         console.log(`Riff with ID ${id} saved successfully!`);
 
@@ -140,6 +156,8 @@ const HomePage = (props) => {
             <RiffForm
                 prompt={homepage.prompt}
                 onSubmit={handleSubmit}
+                userAnswer={homepage.userAnswer} // Add this prop
+                onUserAnswerChange={handleUserAnswerChange} // Add this prop
             />
 
             {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
