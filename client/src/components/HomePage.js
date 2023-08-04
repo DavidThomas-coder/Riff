@@ -135,7 +135,7 @@ const HomePage = (props) => {
 
     return (
         <div>
-        <h1>It's time to Riff!</h1>
+        <h1>It's Time to Riff!</h1>
 
         <RiffForm
             prompt={homepage.prompt}
