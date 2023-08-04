@@ -12,96 +12,94 @@ const HomePage = (props) => {
     });
     const [otherRiffs, setOtherRiffs] = useState([]);
 
-    useEffect(() => {
-        const fetchCurrentPrompt = async () => {
+    // Fetch the current prompt from the backend API
+    const fetchCurrentPrompt = async () => {
         try {
-            const response = await fetch("/api/v1/prompts/current");
-            if (!response.ok) {
+        const response = await fetch("/api/v1/prompts/current");
+        if (!response.ok) {
             throw new Error(`${response.status} (${response.statusText})`);
-            }
-            const { prompt: [currentPrompt] } = await response.json();
-            console.log("Current prompt from the backend:", currentPrompt);
+        }
+        const { prompt: [currentPrompt] } = await response.json();
+        console.log("Current prompt from the backend:", currentPrompt);
 
-            if (currentPrompt) {
+        if (currentPrompt) {
             setHomepage((prevHomepage) => ({
-                ...prevHomepage,
-                prompt: currentPrompt.promptBody,
-                promptId: currentPrompt.id,
+            ...prevHomepage,
+            prompt: currentPrompt.promptBody,
+            promptId: currentPrompt.id,
             }));
-            } else {
-            const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-            setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
-            }
-        } catch (error) {
-            console.error("Error fetching the current prompt:", error);
+        } else {
             const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
             setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
         }
-        };
+        } catch (error) {
+        console.error("Error fetching the current prompt:", error);
+        const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+        setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
+        }
+    };
 
-        const fetchSubmittedRiff = async () => {
+    // Fetch the user's submitted riff from the backend API
+    const fetchSubmittedRiff = async () => {
         try {
-            if (!props.user || !props.user.id) {
+        if (!props.user || !props.user.id) {
             console.error("Error: userId not available");
             return;
-            }
+        }
 
-            const response = await fetch(`/api/v1/riffs/${props.user.id}`);
-            if (!response.ok) {
+        const response = await fetch(`/api/v1/riffs/${props.user.id}`);
+        if (!response.ok) {
             throw new Error(`${response.status} (${response.statusText})`);
-            }
+        }
 
-            const { riff } = await response.json();
-            console.log("User's submitted riff from the backend:", riff);
+        const { riff } = await response.json();
+        console.log("User's submitted riff from the backend:", riff);
 
-            if (riff && riff.riffBody) {
+        if (riff && riff.riffBody) {
             setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
-            }
-        } catch (error) {
-            console.error("Error fetching the user's submitted riff:", error);
         }
-        };
+        } catch (error) {
+        console.error("Error fetching the user's submitted riff:", error);
+        }
+    };
 
-        const fetchOtherRiffs = async () => {
+    // Fetch other users' riffs from the backend API
+    const fetchOtherRiffs = async () => {
         try {
-            const response = await fetch("/api/v1/riffs");
-            if (!response.ok) {
+        const response = await fetch("/api/v1/riffs");
+        if (!response.ok) {
             throw new Error(`${response.status} (${response.statusText})`);
-            }
-
-            const { riffs } = await response.json();
-            console.log("Other users' submitted riffs from the backend:", riffs);
-
-            const filteredRiffs = riffs.filter((riff) => riff.userId !== props.user.id);
-            setOtherRiffs(filteredRiffs);
-        } catch (error) {
-            console.error("Error fetching other users' riffs:", error);
         }
-        };
 
-        // Function to clear riffs at midnight
-        const clearRiffsAtMidnight = () => {
-        setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: "" }));
+        const { riffs } = await response.json();
+        console.log("Other users' submitted riffs from the backend:", riffs);
+
+        const filteredRiffs = riffs.filter((riff) => riff.userId !== props.user.id);
+        setOtherRiffs(filteredRiffs);
+        } catch (error) {
+        console.error("Error fetching other users' riffs:", error);
+        }
+    };
+
+    // Function to clear riffs at midnight
+    const clearRiffsAtMidnight = () => {
+        setHomepage((prevHomepage) => ({
+        ...prevHomepage,
+        submittedAnswer: "",
+        prompt: "", // Reset the prompt as well
+        }));
         setOtherRiffs([]); // Clear other users' riffs
-        };
+    };
 
-        // Set up interval to fetch the current prompt and clear riffs at midnight
-        const dailyUpdateInterval = setInterval(() => {
+    useEffect(() => {
+        // Fetch the current prompt, user's submitted riff, and other users' riffs when the component mounts
         fetchCurrentPrompt();
         fetchSubmittedRiff();
         if (props.user && props.user.id) {
-            fetchOtherRiffs();
+        fetchOtherRiffs();
         }
-        }, 60000); // Check every minute, you can adjust this time based on your needs
 
-        // Clean up the interval when the component unmounts
-        return () => {
-        clearInterval(dailyUpdateInterval);
-        };
-    }, [props.user]);
-
-    // Additional useEffect hook to reset the state at midnight
-    useEffect(() => {
+        // Set up a timeout to clear the riffs and fetch the new prompt at midnight
         const now = new Date();
         const midnight = new Date();
         midnight.setUTCHours(24, 0, 0, 0);
@@ -110,9 +108,13 @@ const HomePage = (props) => {
         setTimeout(() => {
         clearRiffsAtMidnight();
         fetchCurrentPrompt();
+        if (props.user && props.user.id) {
+            fetchOtherRiffs();
+        }
         }, timeUntilMidnight);
-    }, []);
+    }, [props.user]);
 
+    // Function to handle form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -149,7 +151,9 @@ const HomePage = (props) => {
         <div>
         <h1>It's time to Riff!</h1>
 
-        <RiffForm prompt={homepage.prompt} onSubmit={handleSubmit} />
+        {homepage.prompt && ( // Only render the RiffForm when prompt is available
+            <RiffForm prompt={homepage.prompt} onSubmit={handleSubmit} />
+        )}
 
         {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
 
@@ -166,4 +170,3 @@ const HomePage = (props) => {
 };
 
 export default HomePage;
-
