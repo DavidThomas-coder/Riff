@@ -101,6 +101,13 @@ const HomePage = (props) => {
         };
     }, [props.user]);
 
+    const handleUserAnswerChange = (event) => {
+        setHomepage((prevHomepage) => ({
+        ...prevHomepage,
+        userAnswer: event.target.value,
+        }));
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -116,7 +123,11 @@ const HomePage = (props) => {
             headers: {
             "Content-Type": "application/json",
             },
-            body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
+            body: JSON.stringify({
+            riffBody: homepage.userAnswer,
+            userId: props.user.id,
+            promptId: homepage.promptId,
+            }),
         });
 
         if (!response.ok) {
@@ -124,10 +135,14 @@ const HomePage = (props) => {
         }
 
         const data = await response.json();
-        const { id } = data.riff;
+        const { id, riffBody } = data.riff;
         console.log(`Riff with ID ${id} saved successfully!`);
 
-        setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
+        setHomepage((prevHomepage) => ({
+            ...prevHomepage,
+            submittedAnswer: riffBody,
+            userAnswer: "",
+        }));
         } catch (error) {
         console.error("Error saving riff:", error);
         }
@@ -135,23 +150,29 @@ const HomePage = (props) => {
 
     return (
         <div>
-            <h1>It's time to Riff!</h1>
+        <h1>It's time to Riff!</h1>
 
-            <RiffForm
-                prompt={homepage.prompt}
-                onSubmit={handleSubmit}
-            />
+        <RiffForm
+            prompt={homepage.prompt}
+            userAnswer={homepage.userAnswer}
+            onUserAnswerChange={handleUserAnswerChange}
+            onSubmit={handleSubmit}
+        />
 
-            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+        {homepage.submittedAnswer ? (
+            <UserRiffTile submittedAnswer={homepage.submittedAnswer} />
+        ) : (
+            <p>No answer submitted yet.</p>
+        )}
 
-            <h2>Other Users' Riffs:</h2>
-            <div className="grid-container grid-x">
-                {otherRiffs.map((riff, index) => (
-                    <div key={index} className="cell small-4">
-                        <OtherRiffTile userId={riff.userId} riff={riff.riffBody} />
-                    </div>
-                ))}
+        <h2>Other Users' Riffs:</h2>
+        <div className="grid-container grid-x">
+            {otherRiffs.map((riff, index) => (
+            <div key={index} className="cell small-4">
+                <OtherRiffTile userId={riff.userId} riff={riff.riffBody} />
             </div>
+            ))}
+        </div>
         </div>
     );
 };
