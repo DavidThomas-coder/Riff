@@ -12,6 +12,7 @@ const HomePage = (props) => {
     });
     const [otherRiffs, setOtherRiffs] = useState([]);
     const [currentPromptDate, setCurrentPromptDate] = useState(new Date());
+    let dailyUpdateInterval;
 
     useEffect(() => {
         const fetchCurrentPrompt = async () => {
@@ -70,21 +71,21 @@ const HomePage = (props) => {
                 if (!response.ok) {
                     throw new Error(`${response.status} (${response.statusText})`);
                 }
-
+        
                 const { riffs } = await response.json();
                 console.log("Other users' submitted riffs from the backend:", riffs);
-
+        
                 const today = new Date();
                 const filteredRiffs = riffs.filter((riff) => {
                     const riffDate = new Date(riff.createdAt);
                     return riff.userId !== props.user.id && riffDate.toDateString() === today.toDateString();
                 });
-
+        
                 setOtherRiffs(filteredRiffs);
             } catch (error) {
                 console.error("Error fetching other users' riffs:", error);
             }
-        };
+        };        
 
         fetchCurrentPrompt();
         fetchSubmittedRiff();
@@ -96,7 +97,7 @@ const HomePage = (props) => {
         midnight.setUTCHours(24, 0, 0, 0);
         const timeUntilMidnight = midnight - Date.now();
 
-        const dailyUpdateInterval = setInterval(() => {
+        dailyUpdateInterval = setInterval(() => {
             fetchCurrentPrompt();
             fetchSubmittedRiff();
             if (props.user && props.user.id) {
@@ -111,18 +112,19 @@ const HomePage = (props) => {
         return () => {
             clearInterval(dailyUpdateInterval);
         };
-    }, [props.user, currentPromptDate]);
+    }, [props.user]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
+            console.log("User Answer:", homepage.userAnswer);
             if (!props.user || !props.user.id) {
                 console.error("Error: userId not available");
                 return;
             }
-
+    
             console.log("UserId:", props.user.id);
-
+    
             const response = await fetch("/api/v1/riffs", {
                 method: "POST",
                 headers: {
@@ -130,20 +132,22 @@ const HomePage = (props) => {
                 },
                 body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
             });
-
+    
             if (!response.ok) {
                 throw new Error(`${response.status} (${response.statusText})`);
             }
-
+    
             const data = await response.json();
-            const { id } = data.riff;
+            const { id, riffBody } = data.riff;
             console.log(`Riff with ID ${id} saved successfully!`);
-
-            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
+            console.log("Riff body:", riffBody)
+    
+            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riffBody, userAnswer: "" }));
+            console.log("Submitted Answer:", homepage.submittedAnswer);
         } catch (error) {
             console.error("Error saving riff:", error);
         }
-    };
+    };    
 
     return (
         <div>
@@ -154,7 +158,11 @@ const HomePage = (props) => {
                 onSubmit={handleSubmit}
             />
 
-            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+            {homepage.submittedAnswer ? (
+                <UserRiffTile submittedAnswer={homepage.submittedAnswer} />
+            ) : (
+                <p>No answer submitted yet.</p>
+            )}
 
             <h2>Other Users' Riffs:</h2>
             <div className="grid-container grid-x">
