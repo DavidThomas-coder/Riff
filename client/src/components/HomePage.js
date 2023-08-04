@@ -11,125 +11,137 @@ const HomePage = (props) => {
         submittedAnswer: "",
     });
     const [otherRiffs, setOtherRiffs] = useState([]);
+    const [currentPromptDate, setCurrentPromptDate] = useState(new Date());
 
     useEffect(() => {
         const fetchCurrentPrompt = async () => {
-        try {
-            const response = await fetch("/api/v1/prompts/current");
-            if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
-            }
-            const { prompt: [currentPrompt] } = await response.json();
-            console.log("Current prompt from the backend:", currentPrompt);
+            try {
+                const response = await fetch("/api/v1/prompts/current");
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+                const { prompt: [currentPrompt] } = await response.json();
+                console.log("Current prompt from the backend:", currentPrompt);
 
-            if (currentPrompt) {
-            setHomepage((prevHomepage) => ({
-                ...prevHomepage,
-                prompt: currentPrompt.promptBody,
-                promptId: currentPrompt.id,
-            }));
-            } else {
-            const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-            setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
+                if (currentPrompt) {
+                    setHomepage((prevHomepage) => ({
+                        ...prevHomepage,
+                        prompt: currentPrompt.promptBody,
+                        promptId: currentPrompt.id,
+                    }));
+                    setCurrentPromptDate(new Date(currentPrompt.createdAt));
+                } else {
+                    const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+                    setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
+                }
+            } catch (error) {
+                console.error("Error fetching the current prompt:", error);
+                const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+                setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
             }
-        } catch (error) {
-            console.error("Error fetching the current prompt:", error);
-            const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
-            setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
-        }
         };
 
         const fetchSubmittedRiff = async () => {
-        try {
-            if (!props.user || !props.user.id) {
-            console.error("Error: userId not available");
-            return;
-            }
+            try {
+                if (!props.user || !props.user.id) {
+                    console.error("Error: userId not available");
+                    return;
+                }
 
-            const response = await fetch(`/api/v1/riffs/${props.user.id}`);
-            if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
-            }
+                const response = await fetch(`/api/v1/riffs/${props.user.id}`);
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
 
-            const { riff } = await response.json();
-            console.log("User's submitted riff from the backend:", riff);
+                const { riff } = await response.json();
+                console.log("User's submitted riff from the backend:", riff);
 
-            if (riff && riff.riffBody) {
-            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
+                if (riff && riff.riffBody) {
+                    setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
+                }
+            } catch (error) {
+                console.error("Error fetching the user's submitted riff:", error);
             }
-        } catch (error) {
-            console.error("Error fetching the user's submitted riff:", error);
-        }
         };
 
         const fetchOtherRiffs = async () => {
-        try {
-            const response = await fetch("/api/v1/riffs");
-            if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
+            try {
+                const response = await fetch("/api/v1/riffs");
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+
+                const { riffs } = await response.json();
+                console.log("Other users' submitted riffs from the backend:", riffs);
+
+                const today = new Date();
+                const filteredRiffs = riffs.filter((riff) => {
+                    const riffDate = new Date(riff.createdAt);
+                    return riff.userId !== props.user.id && riffDate.toDateString() === today.toDateString();
+                });
+
+                setOtherRiffs(filteredRiffs);
+            } catch (error) {
+                console.error("Error fetching other users' riffs:", error);
             }
-
-            const { riffs } = await response.json();
-            console.log("Other users' submitted riffs from the backend:", riffs);
-
-            const filteredRiffs = riffs.filter((riff) => riff.userId !== props.user.id);
-            setOtherRiffs(filteredRiffs);
-        } catch (error) {
-            console.error("Error fetching other users' riffs:", error);
-        }
         };
 
-        fetchCurrentPrompt();
-        fetchSubmittedRiff();
-        if (props.user && props.user.id) {
-        fetchOtherRiffs();
-        }
-
-        const midnight = new Date();
-        midnight.setUTCHours(24, 0, 0, 0);
-        const timeUntilMidnight = midnight - Date.now();
-        const dailyUpdateInterval = setInterval(() => {
         fetchCurrentPrompt();
         fetchSubmittedRiff();
         if (props.user && props.user.id) {
             fetchOtherRiffs();
         }
+
+        const midnight = new Date();
+        midnight.setUTCHours(24, 0, 0, 0);
+        const timeUntilMidnight = midnight - Date.now();
+
+        const dailyUpdateInterval = setInterval(() => {
+            fetchCurrentPrompt();
+            fetchSubmittedRiff();
+            if (props.user && props.user.id) {
+                fetchOtherRiffs();
+            }
+
+            if (currentPromptDate.toDateString() !== new Date().toDateString()) {
+                setOtherRiffs([]);
+            }
         }, timeUntilMidnight);
 
         return () => {
-        clearInterval(dailyUpdateInterval);
+            clearInterval(dailyUpdateInterval);
         };
-    }, [props.user]);
+    }, [props.user, currentPromptDate]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-        if (!props.user || !props.user.id) {
-            console.error("Error: userId not available");
-            return;
-        }
+            if (!props.user || !props.user.id) {
+                console.error("Error: userId not available");
+                return;
+            }
 
-        console.log("UserId:", props.user.id);
+            console.log("UserId:", props.user.id);
 
-        const response = await fetch("/api/v1/riffs", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
-        });
+            const response = await fetch("/api/v1/riffs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
+            });
 
-        if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
-        }
+            if (!response.ok) {
+                throw new Error(`${response.status} (${response.statusText})`);
+            }
 
-        const data = await response.json();
-        const { id } = data.riff;
-        console.log(`Riff with ID ${id} saved successfully!`);
+            const data = await response.json();
+            const { id } = data.riff;
+            console.log(`Riff with ID ${id} saved successfully!`);
 
-        setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
+            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
         } catch (error) {
-        console.error("Error saving riff:", error);
+            console.error("Error saving riff:", error);
         }
     };
 
