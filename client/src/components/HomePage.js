@@ -152,25 +152,25 @@ const HomePage = (props) => {
     return (
         <div>
 
-          <h1>It's Time to Riff!</h1>
+            <h1>It's Time to Riff!</h1>
 
-          <RiffForm
-              prompt={homepage.prompt}
-              userAnswer={homepage.userAnswer}
-              onUserAnswerChange={(event) => setHomepage({ ...homepage, userAnswer: event.target.value })}
-              onSubmit={handleSubmit}
-          />
+            <RiffForm
+                prompt={homepage.prompt}
+                userAnswer={homepage.userAnswer}
+                onUserAnswerChange={(event) => setHomepage({ ...homepage, userAnswer: event.target.value })}
+                onSubmit={handleSubmit}
+            />
 
-          {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
 
-          <h2>Other Users' Riffs:</h2>
-          <div className="grid-container">
-              {otherRiffs.map((riff, index) => (
-              <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
-              ))}
-          </div>
-
+            <h2>Other Users' Riffs:</h2>
+            <div className="grid-container">
+                {otherRiffs.map((riff, index) => (
+                <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
+                ))}
         </div>
+
+    </div>
     );
 };
 
