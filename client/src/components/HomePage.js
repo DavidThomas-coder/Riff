@@ -101,13 +101,6 @@ const HomePage = (props) => {
         };
     }, [props.user]);
 
-    const handleUserAnswerChange = (event) => {
-        setHomepage((prevHomepage) => ({
-            ...prevHomepage,
-            userAnswer: event.target.value,
-        }));
-    };
-
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -156,8 +149,6 @@ const HomePage = (props) => {
             <RiffForm
                 prompt={homepage.prompt}
                 onSubmit={handleSubmit}
-                userAnswer={homepage.userAnswer} // Add this prop
-                onUserAnswerChange={handleUserAnswerChange} // Add this prop
             />
 
             {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
