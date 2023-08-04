@@ -114,17 +114,20 @@ const HomePage = (props) => {
         };
     }, [props.user]);
 
+    const handleChange = (event) => {
+        setHomepage((prevHomepage) => ({ ...prevHomepage, userAnswer: event.target.value }));
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            console.log("User Answer:", homepage.userAnswer);
             if (!props.user || !props.user.id) {
                 console.error("Error: userId not available");
                 return;
             }
-    
+
             console.log("UserId:", props.user.id);
-    
+
             const response = await fetch("/api/v1/riffs", {
                 method: "POST",
                 headers: {
@@ -132,18 +135,16 @@ const HomePage = (props) => {
                 },
                 body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
             });
-    
+
             if (!response.ok) {
                 throw new Error(`${response.status} (${response.statusText})`);
             }
-    
+
             const data = await response.json();
             const { id, riffBody } = data.riff;
             console.log(`Riff with ID ${id} saved successfully!`);
-            console.log("Riff body:", riffBody)
-    
+
             setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riffBody, userAnswer: "" }));
-            console.log("Submitted Answer:", homepage.submittedAnswer);
         } catch (error) {
             console.error("Error saving riff:", error);
         }
@@ -155,6 +156,8 @@ const HomePage = (props) => {
 
             <RiffForm
                 prompt={homepage.prompt}
+                userAnswer={homepage.userAnswer}
+                onUserAnswerChange={handleChange}
                 onSubmit={handleSubmit}
             />
 
@@ -177,3 +180,4 @@ const HomePage = (props) => {
 };
 
 export default HomePage;
+
