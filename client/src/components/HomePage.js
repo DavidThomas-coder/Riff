@@ -92,25 +92,36 @@ const HomePage = (props) => {
     };
 
     useEffect(() => {
-        // Fetch the current prompt, user's submitted riff, and other users' riffs when the component mounts
-        fetchCurrentPrompt();
-        fetchSubmittedRiff();
-        if (props.user && props.user.id) {
-        fetchOtherRiffs();
-        }
-
-        // Set up a timeout to clear the riffs and fetch the new prompt at midnight
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setUTCHours(24, 0, 0, 0);
-        const timeUntilMidnight = midnight - now;
-
-        setTimeout(() => {
-        clearRiffsAtMidnight();
-        fetchCurrentPrompt();
-        if (props.user && props.user.id) {
+        // Function to clear riffs at midnight
+        const clearRiffsAtMidnight = () => {
+            setHomepage((prevHomepage) => ({
+                ...prevHomepage,
+                submittedAnswer: "",
+                prompt: "", // Reset the prompt as well
+            }));
+            setOtherRiffs([]); // Clear other users' riffs
+            };
+        
+            // Fetch the current prompt, user's submitted riff, and other users' riffs when the component mounts
+            fetchCurrentPrompt();
+            fetchSubmittedRiff();
+            if (props.user && props.user.id) {
             fetchOtherRiffs();
-        }
+            }
+        
+            // Calculate the time remaining until midnight
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setUTCHours(24, 0, 0, 0);
+            const timeUntilMidnight = midnight - now;
+        
+            // Set up a timeout to clear the riffs and fetch the new prompt at midnight
+            setTimeout(() => {
+            clearRiffsAtMidnight();
+            fetchCurrentPrompt();
+            if (props.user && props.user.id) {
+                fetchOtherRiffs();
+            }
         }, timeUntilMidnight);
     }, [props.user]);
 
