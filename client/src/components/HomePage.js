@@ -79,27 +79,39 @@ const HomePage = (props) => {
         }
         };
 
-        fetchCurrentPrompt();
-        fetchSubmittedRiff();
-        if (props.user && props.user.id) {
-        fetchOtherRiffs();
-        }
+        // Function to clear riffs at midnight
+        const clearRiffsAtMidnight = () => {
+        setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: "" }));
+        setOtherRiffs([]); // Clear other users' riffs
+        };
 
-        const midnight = new Date();
-        midnight.setUTCHours(24, 0, 0, 0);
-        const timeUntilMidnight = midnight - Date.now();
+        // Set up interval to fetch the current prompt and clear riffs at midnight
         const dailyUpdateInterval = setInterval(() => {
         fetchCurrentPrompt();
         fetchSubmittedRiff();
         if (props.user && props.user.id) {
             fetchOtherRiffs();
         }
-        }, timeUntilMidnight);
+        }, 60000); // Check every minute, you can adjust this time based on your needs
 
+        // Clean up the interval when the component unmounts
         return () => {
         clearInterval(dailyUpdateInterval);
         };
     }, [props.user]);
+
+    // Additional useEffect hook to reset the state at midnight
+    useEffect(() => {
+        const now = new Date();
+        const midnight = new Date();
+        midnight.setUTCHours(24, 0, 0, 0);
+        const timeUntilMidnight = midnight - now;
+
+        setTimeout(() => {
+        clearRiffsAtMidnight();
+        fetchCurrentPrompt();
+        }, timeUntilMidnight);
+    }, []);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -135,25 +147,23 @@ const HomePage = (props) => {
 
     return (
         <div>
-            <h1>It's time to Riff!</h1>
+        <h1>It's time to Riff!</h1>
 
-            <RiffForm
-                prompt={homepage.prompt}
-                onSubmit={handleSubmit}
-            />
+        <RiffForm prompt={homepage.prompt} onSubmit={handleSubmit} />
 
-            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+        {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
 
-            <h2>Other Users' Riffs:</h2>
-            <div className="grid-container grid-x">
-                {otherRiffs.map((riff, index) => (
-                    <div key={index} className="cell small-4">
-                        <OtherRiffTile userId={riff.userId} riff={riff.riffBody} />
-                    </div>
-                ))}
+        <h2>Other Users' Riffs:</h2>
+        <div className="grid-container grid-x">
+            {otherRiffs.map((riff, index) => (
+            <div key={index} className="cell small-4">
+                <OtherRiffTile userId={riff.userId} riff={riff.riffBody} />
             </div>
+            ))}
+        </div>
         </div>
     );
 };
 
 export default HomePage;
+
