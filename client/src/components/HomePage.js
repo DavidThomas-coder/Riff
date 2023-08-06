@@ -118,44 +118,55 @@ const HomePage = (props) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-        console.log("Data to be sent to the backend:", {
+        
+            // Check if the user has already submitted a riff for today
+            if (props.user.lastSubmittedRiffDate) {
+            const currentDate = new Date().toISOString().slice(0, 10);
+            if (props.user.lastSubmittedRiffDate === currentDate) {
+                console.log("You have already submitted a riff for today!");
+                return;
+            }
+        }
+        
+            console.log("Data to be sent to the backend:", {
             riffBody: homepage.userAnswer,
             userId: props.user.id,
             promptId: homepage.promptId,
         });
-
-        try {
-        if (!props.user || !props.user.id) {
-            console.error("Error: userId not available");
-            return;
+        
+            try {
+            if (!props.user || !props.user.id) {
+                console.error("Error: userId not available");
+                return;
         }
-
-        console.log("UserId:", props.user.id);
-
-        const response = await fetch("/api/v1/riffs", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
+        
+            console.log("UserId:", props.user.id);
+        
+            const response = await fetch("/api/v1/riffs", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
         });
-
-
-        if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
+        
+            if (!response.ok) {
+                throw new Error(`${response.status} (${response.statusText})`);
         }
-
-        const data = await response.json();
-        console.log("RESPONSE:", data)
-        const { id } = data.riff;
-        console.log(`Riff with ID ${id} saved successfully!`);
-
-        setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
-        } catch (error) {
-        console.error("Error saving riff:", error);
+        
+            const data = await response.json();
+            console.log("RESPONSE:", data);
+            const { id } = data.riff;
+            console.log(`Riff with ID ${id} saved successfully!`);
+        
+            // Update the lastSubmittedRiffDate for the user on the server-side
+            props.user.lastSubmittedRiffDate = new Date().toISOString().slice(0, 10);
+        
+            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
+            } catch (error) {
+            console.error("Error saving riff:", error);
         }
-    };
+    };      
 
     return (
         <div>
