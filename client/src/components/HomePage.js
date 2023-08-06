@@ -63,21 +63,29 @@ const HomePage = (props) => {
         };
 
         const fetchOtherRiffs = async () => {
-        try {
-            const response = await fetch("/api/v1/riffs");
-            if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
+            try {
+                const response = await fetch("/api/v1/riffs");
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+            
+                const { riffs } = await response.json();
+                console.log("Other users' submitted riffs from the backend:", riffs);
+            
+                // Get the current date in the format "YYYY-MM-DD"
+                const currentDate = new Date().toISOString().slice(0, 10);
+            
+                // Filter the riffs whose createdAt date is equal to the current date
+                const filteredRiffs = riffs.filter((riff) => {
+                    const createdAtDate = new Date(riff.createdAt).toISOString().slice(0, 10);
+                    return riff.userId !== props.user.id && createdAtDate === currentDate;
+                });
+            
+                setOtherRiffs(filteredRiffs);
+                } catch (error) {
+                console.error("Error fetching other users' riffs:", error);
             }
-
-            const { riffs } = await response.json();
-            console.log("Other users' submitted riffs from the backend:", riffs);
-
-            const filteredRiffs = riffs.filter((riff) => riff.userId !== props.user.id);
-            setOtherRiffs(filteredRiffs);
-        } catch (error) {
-            console.error("Error fetching other users' riffs:", error);
-        }
-        };
+        };          
 
         fetchCurrentPrompt();
         fetchSubmittedRiff();
@@ -115,7 +123,7 @@ const HomePage = (props) => {
             riffBody: homepage.userAnswer,
             userId: props.user.id,
             promptId: homepage.promptId,
-          });
+        });
 
         try {
         if (!props.user || !props.user.id) {
