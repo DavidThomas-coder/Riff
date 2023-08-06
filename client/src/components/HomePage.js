@@ -11,6 +11,7 @@ const HomePage = (props) => {
         submittedAnswer: "",
     });
     const [otherRiffs, setOtherRiffs] = useState([]);
+    const [error, setError] = useState(null); // Add the error state
 
     useEffect(() => {
         const fetchCurrentPrompt = async () => {
@@ -119,14 +120,14 @@ const HomePage = (props) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         
-            // Check if the user has already submitted a riff for today
-            if (props.user.lastSubmittedRiffDate) {
+  // Check if the user has already submitted a riff for today
+        if (props.user.lastSubmittedRiffDate) {
             const currentDate = new Date().toISOString().slice(0, 10);
             if (props.user.lastSubmittedRiffDate === currentDate) {
-                console.log("You have already submitted a riff for today!");
-                return;
-            }
+            setError("You have already submitted a riff for today!"); // Set the error message
+            return;
         }
+    } 
         
             console.log("Data to be sent to the backend:", {
             riffBody: homepage.userAnswer,
@@ -171,7 +172,10 @@ const HomePage = (props) => {
     return (
         <div>
 
-            <h1>It's Time to Riff!</h1>
+            <div>
+                <h1>It's Time to Riff!</h1>
+                {error && <div className="error-message">{error}</div>}
+            </div>
 
             <RiffForm
                 prompt={homepage.prompt}

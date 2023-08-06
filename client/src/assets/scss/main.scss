@@ -101,3 +101,12 @@ button[type="submit"]:hover {
   margin-left: 20px;
   margin-right: 20px;
 }
+
+.error-message {
+  background-color: #ffdddd;
+  color: #cc0000;
+  border: 1px solid #cc0000;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
