@@ -123,7 +123,7 @@ const HomePage = (props) => {
             riffBody: homepage.userAnswer,
             userId: props.user.id,
             promptId: homepage.promptId,
-          });
+        });
 
         try {
         if (!props.user || !props.user.id) {
