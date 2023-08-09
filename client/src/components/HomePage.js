@@ -41,27 +41,35 @@ const HomePage = (props) => {
         };
 
         const fetchSubmittedRiff = async () => {
-        try {
-            if (!props.user || !props.user.id) {
-            console.error("Error: userId not available");
-            return;
+            try {
+                if (!props.user || !props.user.id) {
+                    console.error("Error: userId not available");
+                    return;
+                }
+        
+                const response = await fetch(`/api/v1/riffs/${props.user.id}`);
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+        
+                const { riff } = await response.json();
+                console.log("User's submitted riff from the backend:", riff);
+        
+                if (riff && riff.riffBody) {
+                    const currentDate = new Date().toISOString().slice(0, 10);
+                    const riffDate = new Date(riff.createdAt).toISOString().slice(0, 10);
+        
+                    if (currentDate === riffDate) {
+                        setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
+                    } else {
+                        console.log("You haven't submitted a riff today.");
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching the user's submitted riff:", error);
             }
-
-            const response = await fetch(`/api/v1/riffs/${props.user.id}`);
-            if (!response.ok) {
-            throw new Error(`${response.status} (${response.statusText})`);
-            }
-
-            const { riff }  = await response.json();
-            console.log("User's submitted riff from the backend:", riff);
-
-            if (riff && riff.riffBody) {
-            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
-            }
-        } catch (error) {
-            console.error("Error fetching the user's submitted riff:", error);
-        }
         };
+        
 
         const fetchOtherRiffs = async () => {
             try {
