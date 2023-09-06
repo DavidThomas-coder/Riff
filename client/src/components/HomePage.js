@@ -139,7 +139,7 @@ const HomePage = (props) => {
         if (props.user.lastSubmittedRiffDate) {
             const currentDate = new Date().toISOString().slice(0, 10);
             if (props.user.lastSubmittedRiffDate === currentDate) {
-                setError("You have already submitted a riff for today!"); // Set the error message
+                setError("You've already riffed today!"); // Set the error message
                 return;
             }
         }
