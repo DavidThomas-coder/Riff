@@ -89,12 +89,12 @@ const HomePage = (props) => {
                     promptId: currentPrompt.id,
                 }));
             } else {
-                const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+                const defaultPrompt = "Here's your daily prompt! Answer this question...";
                 setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
             }
         } catch (error) {
             console.error("Error fetching the current prompt:", error);
-            const defaultPrompt = "Welcome to the daily prompt! Answer this question...";
+            const defaultPrompt = "Here's your daily prompt! Answer this question...";
             setHomepage((prevHomepage) => ({ ...prevHomepage, prompt: defaultPrompt }));
         }
     };
