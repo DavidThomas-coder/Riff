@@ -10,7 +10,7 @@ const UserProfile = (props) => {
         <div className="userProfile">
             <div class="cell medium-6">
                 <div class="profile-info">
-                <p>Your Username: {props.user.username}</p>
+                <p>Username: {props.user.username}</p>
                 </div>
             </div>
         </div>
