@@ -3,7 +3,7 @@ import React from "react";
 const RiffTile = ({ submittedAnswer }) => {
     return (
         <div className="user-riff-tile">
-            <p>Your Answer:</p>
+            <p>Your Riff:</p>
             <p>{submittedAnswer}</p>
         </div>
     );
