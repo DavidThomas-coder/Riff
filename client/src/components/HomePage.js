@@ -63,10 +63,10 @@ const HomePage = (props) => {
                 if (currentDate === riffDate) {
                     setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
                 } else {
-                    console.log("You haven't riffed yet today.");
+                    console.log("Time To Riff!");
                 }
             } else {
-                console.log("You haven't riffed yet today.");
+                console.log("Time To Riff!");
             }
         } catch (error) {
             console.error("Error fetching the user's submitted riff:", error);
