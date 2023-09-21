@@ -185,28 +185,34 @@ const HomePage = (props) => {
     };
 
     return (
+    <div>
         <div>
-            <div>
-                <h1>Riff Time!</h1>
-                {error && <div className="error-message">{error}</div>}
-            </div>
+            <h1>Riff Time!</h1>
+            {error && <div className="error-message">{error}</div>}
+        </div>
 
+        {props.user ? (
+            // User is signed in, render the form
             <RiffForm
                 prompt={homepage.prompt}
                 userAnswer={homepage.userAnswer}
                 onUserAnswerChange={handleUserAnswerChange}
                 onSubmit={handleSubmit}
             />
+        ) : (
+            // User is not signed in, render the "Sign In To Riff!" header
+            <h2>Sign In To Riff!</h2>
+        )}
 
-            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+        {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
 
-            <h2>Other Users' Riffs:</h2>
-            <div className="grid-container">
-                {otherRiffs.map((riff, index) => (
-                    <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
-                ))}
-            </div>
+        <h2>Other Users' Riffs:</h2>
+        <div className="grid-container">
+            {otherRiffs.map((riff, index) => (
+                <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
+            ))}
         </div>
+    </div>
     );
 };
 
