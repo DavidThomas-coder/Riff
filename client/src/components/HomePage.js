@@ -144,7 +144,7 @@ const HomePage = (props) => {
             }
         }
 
-        console.log("Data to be sent to the backend:", {
+        console.log("Data sent to the backend:", {
             riffBody: homepage.userAnswer,
             userId: props.user.id,
             promptId: homepage.promptId,
