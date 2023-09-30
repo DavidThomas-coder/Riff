@@ -80,7 +80,7 @@ const HomePage = (props) => {
                 throw new Error(`${response.status} (${response.statusText})`);
             }
             const { prompt: [currentPrompt] } = await response.json();
-            console.log("Current prompt from the backend:", currentPrompt);
+            console.log("Today's prompt from the backend:", currentPrompt);
 
             if (currentPrompt) {
                 setHomepage((prevHomepage) => ({
