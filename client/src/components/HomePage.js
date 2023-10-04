@@ -4,43 +4,57 @@ import RiffForm from "./RiffForm";
 import OtherRiffTile from "./OtherRiffTile";
 
 const HomePage = (props) => {
+    // Define the initial state
     const [homepage, setHomepage] = useState({
         prompt: "",
         promptId: null,
         userAnswer: "",
         submittedAnswer: "",
     });
+    
+    // Define the state for other user's riffs
     const [otherRiffs, setOtherRiffs] = useState([]);
-    const [error, setError] = useState(null); // Add the error state
+    
+    // Define the state for errors
+    const [error, setError] = useState(null);
 
+    // Effect to fetch initial data when the component mounts
     useEffect(() => {
         const fetchInitialData = async () => {
+            // Fetch the current prompt
             await fetchCurrentPrompt();
+            
+            // If a user is logged in, fetch other riffs and the user's submitted riff
             if (props.user && props.user.id) {
                 await fetchOtherRiffs();
-                await fetchSubmittedRiff(); // Fetch and display user's submitted riff
+                await fetchSubmittedRiff();
             }
         };
 
         // Call fetchInitialData when the page loads
         fetchInitialData();
 
+        // Calculate the time until midnight
         const midnight = new Date();
         midnight.setUTCHours(24, 0, 0, 0);
         const timeUntilMidnight = midnight - Date.now();
+
+        // Set up a daily update interval
         const dailyUpdateInterval = setInterval(async () => {
             await fetchCurrentPrompt();
             if (props.user && props.user.id) {
                 await fetchOtherRiffs();
-                await fetchSubmittedRiff(); // Fetch and display user's submitted riff
+                await fetchSubmittedRiff();
             }
         }, timeUntilMidnight);
 
+        // Clear the interval when the component unmounts
         return () => {
             clearInterval(dailyUpdateInterval);
         };
     }, [props.user]);
 
+    // Function to fetch the user's submitted riff
     const fetchSubmittedRiff = async () => {
         try {
             if (!props.user || !props.user.id) {
@@ -54,17 +68,9 @@ const HomePage = (props) => {
             }
 
             const { riff } = await response.json();
-            console.log("User's submitted riff from the backend:", riff);
 
             if (riff && riff.riffBody) {
-                const currentDate = new Date().toISOString().slice(0, 10);
-                const riffDate = new Date(riff.createdAt).toISOString().slice(0, 10);
-
-                if (currentDate === riffDate) {
-                    setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
-                } else {
-                    console.log("Time To Riff!");
-                }
+                setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
             } else {
                 console.log("Time To Riff!");
             }
@@ -73,6 +79,7 @@ const HomePage = (props) => {
         }
     };
 
+    // Function to fetch the current prompt
     const fetchCurrentPrompt = async () => {
         try {
             const response = await fetch("/api/v1/prompts/current");
@@ -80,7 +87,6 @@ const HomePage = (props) => {
                 throw new Error(`${response.status} (${response.statusText})`);
             }
             const { prompt: [currentPrompt] } = await response.json();
-            console.log("Today's prompt from the backend:", currentPrompt);
 
             if (currentPrompt) {
                 setHomepage((prevHomepage) => ({
@@ -99,6 +105,7 @@ const HomePage = (props) => {
         }
     };
 
+    // Function to fetch other user's riffs
     const fetchOtherRiffs = async () => {
         try {
             const response = await fetch("/api/v1/riffs");
@@ -107,8 +114,7 @@ const HomePage = (props) => {
             }
 
             const { riffs } = await response.json();
-            console.log("Other users' submitted riffs from the backend:", riffs);
-
+            
             // Get the current date in the format "YYYY-MM-DD"
             const currentDate = new Date().toISOString().slice(0, 10);
 
@@ -124,6 +130,7 @@ const HomePage = (props) => {
         }
     };
 
+    // Function to handle user answer change
     const handleUserAnswerChange = (event) => {
         const newUserAnswer = event.target.value;
         setHomepage((prevHomepage) => ({
@@ -132,6 +139,7 @@ const HomePage = (props) => {
         }));
     };
 
+    // Function to handle form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
 
@@ -139,24 +147,16 @@ const HomePage = (props) => {
         if (props.user.lastSubmittedRiffDate) {
             const currentDate = new Date().toISOString().slice(0, 10);
             if (props.user.lastSubmittedRiffDate === currentDate) {
-                setError("You've already riffed today!"); // Set the error message
+                setError("You have already submitted a riff for today!"); // Set the error message
                 return;
             }
         }
-
-        console.log("Data sent to the backend:", {
-            riffBody: homepage.userAnswer,
-            userId: props.user.id,
-            promptId: homepage.promptId,
-        });
 
         try {
             if (!props.user || !props.user.id) {
                 console.error("Error: userId not available");
                 return;
             }
-
-            console.log("UserId:", props.user.id);
 
             const response = await fetch("/api/v1/riffs", {
                 method: "POST",
@@ -171,7 +171,6 @@ const HomePage = (props) => {
             }
 
             const data = await response.json();
-            console.log("RESPONSE:", data);
             const { id } = data.riff;
             console.log(`Riff with ID ${id} saved successfully!`);
 
@@ -185,35 +184,34 @@ const HomePage = (props) => {
     };
 
     return (
-    <div>
         <div>
-            <h1>Riff Time!</h1>
-            {error && <div className="error-message">{error}</div>}
+            <div>
+                <h1>Riff Time!</h1>
+                {error && <div className="error-message">{error}</div>}
+            </div>
+
+            {props.user ? (
+                <RiffForm
+                    prompt={homepage.prompt}
+                    userAnswer={homepage.userAnswer}
+                    onUserAnswerChange={handleUserAnswerChange}
+                    onSubmit={handleSubmit}
+                />
+            ) : (
+                <h2>Sign In To Riff!</h2>
+            )}
+
+            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+
+            <h2>Other Users' Riffs:</h2>
+            <div className="grid-container">
+                {otherRiffs.map((riff, index) => (
+                    <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
+                ))}
+            </div>
         </div>
-
-        {props.user ? (
-            // User is signed in, render the form
-            <RiffForm
-                prompt={homepage.prompt}
-                userAnswer={homepage.userAnswer}
-                onUserAnswerChange={handleUserAnswerChange}
-                onSubmit={handleSubmit}
-            />
-        ) : (
-            // User is not signed in, render the "Sign In To Riff!" header
-            <h2>Sign In To Riff!</h2>
-        )}
-
-        {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
-
-        <h2>Other Users' Riffs:</h2>
-        <div className="grid-container">
-            {otherRiffs.map((riff, index) => (
-                <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
-            ))}
-        </div>
-    </div>
     );
 };
 
 export default HomePage;
+
