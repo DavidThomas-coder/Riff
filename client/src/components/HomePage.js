@@ -54,30 +54,33 @@ const HomePage = (props) => {
         };
     }, [props.user]);
 
-    // Function to fetch the user's submitted riff
-    const fetchSubmittedRiff = async () => {
-        try {
-            if (!props.user || !props.user.id) {
-                console.error("Error: userId not available");
-                return;
-            }
-
-            const response = await fetch(`/api/v1/riffs/${props.user.id}`);
-            if (!response.ok) {
-                throw new Error(`${response.status} (${response.statusText})`);
-            }
-
-            const { riff } = await response.json();
-
-            if (riff && riff.riffBody) {
-                setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
-            } else {
-                console.log("Time To Riff!");
-            }
-        } catch (error) {
-            console.error("Error fetching the user's submitted riff:", error);
+// Function to fetch the user's submitted riff
+const fetchSubmittedRiff = async () => {
+    try {
+        if (!props.user || !props.user.id) {
+            console.error("Error: userId not available");
+            return;
         }
-    };
+
+        const response = await fetch(`/api/v1/riffs/${props.user.id}`);
+        if (!response.ok) {
+            throw new Error(`${response.status} (${response.statusText})`);
+        }
+
+        const { riff } = await response.json();
+
+        if (riff && riff.riffBody) {
+            console.log("Previous submittedAnswer:", homepage.submittedAnswer); // Add this line
+            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: riff.riffBody }));
+            console.log("Updated submittedAnswer:", riff.riffBody); // Add this line
+        } else {
+            console.log("Time To Riff!");
+        }
+    } catch (error) {
+        console.error("Error fetching the user's submitted riff:", error);
+    }
+};
+
 
     // Function to fetch the current prompt
     const fetchCurrentPrompt = async () => {
@@ -142,46 +145,64 @@ const HomePage = (props) => {
     // Function to handle form submission
     const handleSubmit = async (event) => {
         event.preventDefault();
-
-        // Check if the user has already submitted a riff for today
-        if (props.user.lastSubmittedRiffDate) {
-            const currentDate = new Date().toISOString().slice(0, 10);
-            if (props.user.lastSubmittedRiffDate === currentDate) {
-                setError("You have already submitted a riff for today!"); // Set the error message
-                return;
-            }
-        }
-
+    
         try {
             if (!props.user || !props.user.id) {
                 console.error("Error: userId not available");
                 return;
             }
-
-            const response = await fetch("/api/v1/riffs", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
-            });
-
-            if (!response.ok) {
-                throw new Error(`${response.status} (${response.statusText})`);
+    
+            // Check if the user has already submitted a riff for today and the current prompt
+            const currentDate = new Date().toISOString().slice(0, 10);
+            if (props.user.lastSubmittedRiffDate === currentDate && homepage.promptId === props.user.lastSubmittedPromptId) {
+                // Update the existing riff
+                const response = await fetch(`/api/v1/riffs/${props.user.id}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ riffBody: homepage.userAnswer, promptId: homepage.promptId }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+    
+                console.log("Riff updated successfully!");
+            } else {
+                // Create a new riff
+                const response = await fetch("/api/v1/riffs", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ riffBody: homepage.userAnswer, userId: props.user.id, promptId: homepage.promptId }),
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`${response.status} (${response.statusText})`);
+                }
+    
+                const data = await response.json();
+                const { id } = data.riff;
+                console.log(`New riff with ID ${id} created successfully!`);
+    
+                // Update the lastSubmittedRiffDate and lastSubmittedPromptId for the user on the server-side
+                props.user.lastSubmittedRiffDate = currentDate;
+                props.user.lastSubmittedPromptId = homepage.promptId;
             }
-
-            const data = await response.json();
-            const { id } = data.riff;
-            console.log(`Riff with ID ${id} saved successfully!`);
-
-            // Update the lastSubmittedRiffDate for the user on the server-side
-            props.user.lastSubmittedRiffDate = new Date().toISOString().slice(0, 10);
-
-            setHomepage((prevHomepage) => ({ ...prevHomepage, submittedAnswer: prevHomepage.userAnswer, userAnswer: "" }));
+    
+            // Clear the user's answer input field
+            setHomepage((prevHomepage) => ({ ...prevHomepage, userAnswer: "" }));
+    
+            // Fetch the submitted riff again to update the displayed riff
+            await fetchSubmittedRiff();
         } catch (error) {
-            console.error("Error saving riff:", error);
+            console.error("Error saving/updating riff:", error);
         }
     };
+    
+    
 
     return (
         <div>
