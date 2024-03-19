@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 const UserProfile = (props) => {
+    const [riffs, setRiffs] = useState([])
 
     // console.log(user)
     console.log(props)
