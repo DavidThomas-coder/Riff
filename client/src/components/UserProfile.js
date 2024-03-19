@@ -28,16 +28,24 @@ const UserProfile = (props) => {
 
     console.log("Riffs:", riffs); 
 
+    const riffItems = Array.isArray(riffs)
+    ? riffs.map((riff) => (
+        <li key={riff.id}>
+            <p>{riff.riffBody}</p>
+            <p>Created at: {riff.createdAt}</p>
+        </li>
+    ))
+    : [];
+
+    
     return (
         <div className="userProfile">
-            <div class="cell medium-6">
-                <div class="profile-info">
+            <div className="cell medium-6">
+                <div className="profile-info">
                     <p>Username: {props.user.username}</p>
                     <p>Riffs:</p>
                     <ul>
-                        {riffs.map((riff) => (
-                            <li key={riff.id}>{riff.title}</li>
-                        ))}
+                        {riffItems}
                     </ul>
                 </div>
             </div>
