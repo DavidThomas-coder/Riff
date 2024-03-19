@@ -5,6 +5,10 @@ const UserProfile = (props) => {
     // console.log(user)
     console.log(props)
 
+    const fetchUsersRiffs = async () => {
+        
+    }
+
 
     return (
         <div className="userProfile">
