@@ -11,13 +11,15 @@ const UserProfile = (props) => {
             }
     
             const responseData = await response.json();
-            const fetchedRiffs = responseData.riff; 
-            console.log("Fetched riffs:", fetchedRiffs); 
+            console.log("BUTT BUTT responseData:", responseData)
+            const fetchedRiffs = responseData.riff
+            console.log("ASS ASS FetchedRiffs:", fetchedRiffs)
             setRiffs(fetchedRiffs);
         } catch (error) {
             console.error("Error fetching riffs:", error);
         }
     };
+    
     
 
     useEffect(() => {
