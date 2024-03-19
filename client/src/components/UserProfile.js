@@ -14,7 +14,7 @@ const UserProfile = (props) => {
             console.log("BUTT BUTT responseData:", responseData)
             const fetchedRiffs = responseData.riff
             console.log("ASS ASS FetchedRiffs:", fetchedRiffs)
-            setRiffs(fetchedRiffs);
+            setRiffs([fetchedRiffs]);
         } catch (error) {
             console.error("Error fetching riffs:", error);
         }
@@ -40,8 +40,8 @@ const UserProfile = (props) => {
     
     return (
         <div className="userProfile">
-            <div className="cell medium-6">
-                <div className="profile-info">
+            <div>
+                <div>
                     <p>Username: {props.user.username}</p>
                     <p>Riffs:</p>
                     <ul>
