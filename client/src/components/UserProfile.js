@@ -11,8 +11,8 @@ const UserProfile = (props) => {
             }
     
             const responseData = await response.json();
-            const fetchedRiffs = responseData.riff; // Assuming 'riff' is the key containing the array of riffs
-            console.log("Fetched riffs:", fetchedRiffs); // Debugging
+            const fetchedRiffs = responseData.riff; 
+            console.log("Fetched riffs:", fetchedRiffs); 
             setRiffs(fetchedRiffs);
         } catch (error) {
             console.error("Error fetching riffs:", error);
@@ -22,9 +22,9 @@ const UserProfile = (props) => {
 
     useEffect(() => {
         fetchUsersRiffs(props.user.id);
-    }, [props.user.id]);
+    }, [props.user.id,]);
 
-    console.log("Riffs:", riffs); // Debugging
+    console.log("Riffs:", riffs); 
 
     return (
         <div className="userProfile">
