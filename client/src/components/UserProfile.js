@@ -7,13 +7,19 @@ const UserProfile = (props) => {
     console.log(props)
 
     const fetchUsersRiffs = async () => {
-        const response = await fetch (`api/v1/riffs/${props.user.id}`)
+        try {
+            const response = await fetch (`api/v1/riffs/${props.user.id}`)
             if (!response.ok) {
                 throw new Error(`${response.status} (${response.statusText})`)
             }
 
             const { riff } = await response.json()
+        }
     }
+
+useEffect(() => {
+
+})
 
 
     return (
