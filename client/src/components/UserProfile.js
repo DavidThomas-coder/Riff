@@ -1,36 +1,50 @@
 import React, { useEffect, useState } from "react";
 
 const UserProfile = (props) => {
-    const [riffs, setRiffs] = useState([])
+    const [riffs, setRiffs] = useState([]);
 
-    // console.log(user)
-    console.log(props)
-
-    const fetchUsersRiffs = async () => {
+    const fetchUsersRiffs = async (userId) => {
         try {
-            const response = await fetch (`api/v1/riffs/${props.user.id}`)
+            const response = await fetch (`api/v1/riffs/${props.user.id}`);
             if (!response.ok) {
-                throw new Error(`${response.status} (${response.statusText})`)
+                throw new Error(`${response.status} (${response.statusText})`);
             }
 
-            const { riff } = await response.json()
+            const { riffs } = await response.json();
+            setRiffs(riffs);
+        } catch (error) {
+            console.error("Error fetching riffs:", error);
         }
-    }
+    };
 
-useEffect(() => {
-
-})
-
+    useEffect(() => {
+        fetchUsersRiffs(props.user.id);
+    }, [props.user.id]);
 
     return (
         <div className="userProfile">
             <div class="cell medium-6">
                 <div class="profile-info">
-                <p>Username: {props.user.username}</p>
+                    <p>Username: {props.user.username}</p>
+                    <p>Riffs:</p>
+                    <ul>
+                        {riffs.map((riff) => (
+                            <li key={riff.id}>{riff.title}</li>
+                        ))}
+                    </ul>
                 </div>
             </div>
         </div>
     );
 };
 
-export default UserProfile
+export default UserProfile;
+
+
+
+// const response = await fetch (`api/v1/riffs/${props.user.id}`)
+//             if (!response.ok) {
+//                 throw new Error(`${response.status} (${response.statusText})`)
+//             }
+
+//             const { riff } = await response.json()
