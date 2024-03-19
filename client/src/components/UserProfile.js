@@ -5,13 +5,13 @@ const UserProfile = (props) => {
 
     const fetchUsersRiffs = async (userId) => {
         try {
-            const response = await fetch (`api/v1/riffs/${props.user.id}`);
+            const response = await fetch (`api/v1/riffs/${userId}`);
             if (!response.ok) {
                 throw new Error(`${response.status} (${response.statusText})`);
             }
 
-            const { riffs } = await response.json();
-            setRiffs(riffs);
+            const fetchedRiffs = await response.json();
+            setRiffs(fetchedRiffs);
         } catch (error) {
             console.error("Error fetching riffs:", error);
         }
@@ -39,6 +39,7 @@ const UserProfile = (props) => {
 };
 
 export default UserProfile;
+
 
 
 
