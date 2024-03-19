@@ -9,17 +9,22 @@ const UserProfile = (props) => {
             if (!response.ok) {
                 throw new Error(`${response.status} (${response.statusText})`);
             }
-
-            const fetchedRiffs = await response.json();
+    
+            const responseData = await response.json();
+            const fetchedRiffs = responseData.riff; // Assuming 'riff' is the key containing the array of riffs
+            console.log("Fetched riffs:", fetchedRiffs); // Debugging
             setRiffs(fetchedRiffs);
         } catch (error) {
             console.error("Error fetching riffs:", error);
         }
     };
+    
 
     useEffect(() => {
         fetchUsersRiffs(props.user.id);
     }, [props.user.id]);
+
+    console.log("Riffs:", riffs); // Debugging
 
     return (
         <div className="userProfile">
@@ -39,6 +44,7 @@ const UserProfile = (props) => {
 };
 
 export default UserProfile;
+
 
 
 
