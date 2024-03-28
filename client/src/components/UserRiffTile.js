@@ -9,4 +9,4 @@ const UserRiffTile = ({ submittedAnswer }) => {
     );
 };
 
-export default RiffTile;
+export default UserRiffTile;
