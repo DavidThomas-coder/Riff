@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import UserRiffTile from "./UserRiffTile";
 
 const UserProfile = (props) => {
     const [riffs, setRiffs] = useState([]);
@@ -28,14 +29,9 @@ const UserProfile = (props) => {
 
     console.log("Riffs:", riffs); 
 
-    const riffItems = Array.isArray(riffs)
-    ? riffs.map((riff) => (
-        <li key={riff.id}>
-            <p>{riff.riffBody}</p>
-            <p>Created at: {riff.createdAt}</p>
-        </li>
-    ))
-    : [];
+    const riffItems = riffs.map((riff) => (
+        <UserRiffTile key={riff.id} submittedAnswer={riff.riffBody} />
+    ));
 
     
     return (
