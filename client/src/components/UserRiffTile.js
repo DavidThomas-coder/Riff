@@ -1,6 +1,6 @@
 import React from "react";
 
-const RiffTile = ({ submittedAnswer }) => {
+const UserRiffTile = ({ submittedAnswer }) => {
     return (
         <div className="user-riff-tile">
             <p>Your Riff:</p>
