@@ -199,18 +199,21 @@ const HomePage = (props) => {
                         onSubmit={handleSubmit}
                     />
                     {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
-                    {otherRiffs.length > 0 && <h2>Other Users' Riffs:</h2>}
-                    <div className="grid-container">
-                        {otherRiffs.map((riff, index) => (
-                            <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
-                        ))}
-                    </div>
+                    {homepage.submittedAnswer && otherRiffs.length > 0 && <h2>Other Users' Riffs:</h2>}
+                    {homepage.submittedAnswer && otherRiffs.length > 0 && (
+                        <div className="grid-container">
+                            {otherRiffs.map((riff, index) => (
+                                <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
+                            ))}
+                        </div>
+                    )}
                 </>
             ) : (
                 <h2>Sign In To Riff!</h2>
             )}
         </div>
     );
+    
     
 };
 
