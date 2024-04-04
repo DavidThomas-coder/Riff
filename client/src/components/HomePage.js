@@ -189,28 +189,29 @@ const HomePage = (props) => {
                 <h1>Riff Time!</h1>
                 {error && <div className="error-message">{error}</div>}
             </div>
-
+    
             {props.user ? (
-                <RiffForm
-                    prompt={homepage.prompt}
-                    userAnswer={homepage.userAnswer}
-                    onUserAnswerChange={handleUserAnswerChange}
-                    onSubmit={handleSubmit}
-                />
+                <>
+                    <RiffForm
+                        prompt={homepage.prompt}
+                        userAnswer={homepage.userAnswer}
+                        onUserAnswerChange={handleUserAnswerChange}
+                        onSubmit={handleSubmit}
+                    />
+                    {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
+                    {otherRiffs.length > 0 && <h2>Other Users' Riffs:</h2>}
+                    <div className="grid-container">
+                        {otherRiffs.map((riff, index) => (
+                            <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
+                        ))}
+                    </div>
+                </>
             ) : (
                 <h2>Sign In To Riff!</h2>
             )}
-
-            {homepage.submittedAnswer && <UserRiffTile submittedAnswer={homepage.submittedAnswer} />}
-
-            <h2>Other Users' Riffs:</h2>
-            <div className="grid-container">
-                {otherRiffs.map((riff, index) => (
-                    <OtherRiffTile key={index} userId={riff.userId} riff={riff.riffBody} />
-                ))}
-            </div>
         </div>
     );
+    
 };
 
 export default HomePage;
