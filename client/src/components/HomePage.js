@@ -209,7 +209,7 @@ const HomePage = (props) => {
                     )}
                 </>
             ) : (
-                <h2>Sign In To Riff!</h2>
+                <h2>Gotta sign in to!</h2>
             )}
         </div>
     );
