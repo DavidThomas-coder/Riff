@@ -186,7 +186,7 @@ const HomePage = (props) => {
     return (
         <div>
             <div>
-                <h1>Riff Time!</h1>
+                <h1>It's time to Riff!</h1>
                 {error && <div className="error-message">{error}</div>}
             </div>
     
