@@ -14,7 +14,7 @@ const RiffForm = ({ prompt, userAnswer, onUserAnswerChange, onSubmit }) => {
                     onChange={onUserAnswerChange}
                 />
             </label>
-            <button type="submit">Submit</button>
+            <button type="submit">Riff!</button>
         </form>
     );
 };
