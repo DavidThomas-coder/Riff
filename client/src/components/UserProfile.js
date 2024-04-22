@@ -39,7 +39,7 @@ const UserProfile = (props) => {
             <div>
                 <div>
                     <p>Username: {props.user.username}</p>
-                    <p>Riffs:</p>
+                    <p>All Previous Riffs:</p>
                     <ul>
                         {riffItems}
                     </ul>
