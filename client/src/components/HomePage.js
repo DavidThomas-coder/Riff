@@ -48,7 +48,7 @@ const HomePage = (props) => {
             }
         }, timeUntilMidnight);
 
-        // Clear the interval when the component unmounts
+        // Clear the interval when the component changes
         return () => {
             clearInterval(dailyUpdateInterval);
         };
