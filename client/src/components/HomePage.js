@@ -18,7 +18,7 @@ const HomePage = (props) => {
     // Define the state for errors
     const [error, setError] = useState(null);
 
-    // Effect to fetch initial data when the component mounts
+    // Fetch initial data when the component mounts
     useEffect(() => {
         const fetchInitialData = async () => {
             // Fetch the current prompt
