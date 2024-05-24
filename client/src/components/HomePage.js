@@ -79,7 +79,7 @@ const HomePage = (props) => {
         }
     };
 
-    // Function to fetch the current prompt
+    // Function to fetch the current prompt (for that day)
     const fetchCurrentPrompt = async () => {
         try {
             const response = await fetch("/api/v1/prompts/current");
