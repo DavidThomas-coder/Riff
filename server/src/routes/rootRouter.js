@@ -13,6 +13,4 @@ rootRouter.use("/api/v1/users", usersRouter);
 rootRouter.use("/api/v1/prompts", promptsRouter)
 rootRouter.use("/api/v1/riffs", riffsRouter)
 
-//place your server-side routes here
-
 export default rootRouter;
