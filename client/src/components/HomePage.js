@@ -24,7 +24,7 @@ const HomePage = (props) => {
             // Fetch the current prompt
             await fetchCurrentPrompt();
             
-            // If a user is logged in, fetch other riffs and the user's submitted riff
+            // If a user is logged in, fetch all other riffs and the user's submitted riff
             if (props.user && props.user.id) {
                 await fetchOtherRiffs();
                 await fetchSubmittedRiff();
