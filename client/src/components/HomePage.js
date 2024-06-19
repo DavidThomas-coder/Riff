@@ -15,7 +15,7 @@ const HomePage = (props) => {
     // Define the state for other user's riffs
     const [otherRiffs, setOtherRiffs] = useState([]);
     
-    // Define the state for errors
+    // Errors
     const [error, setError] = useState(null);
 
     // Fetch initial data when the component mounts
