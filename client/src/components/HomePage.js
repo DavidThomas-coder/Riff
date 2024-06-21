@@ -34,7 +34,7 @@ const HomePage = (props) => {
         // Call fetchInitialData when the page loads
         fetchInitialData();
 
-        // Calculate the time until midnight
+        // Calculate time 'til midnight
         const midnight = new Date();
         midnight.setUTCHours(24, 0, 0, 0);
         const timeUntilMidnight = midnight - Date.now();
