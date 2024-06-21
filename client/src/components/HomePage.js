@@ -54,7 +54,7 @@ const HomePage = (props) => {
         };
     }, [props.user]);
 
-    // Function to fetch the user's submitted riff
+    // Fetch the user's submitted riff
     const fetchSubmittedRiff = async () => {
         try {
             if (!props.user || !props.user.id) {
