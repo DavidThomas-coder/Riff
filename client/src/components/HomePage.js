@@ -31,7 +31,7 @@ const HomePage = (props) => {
             }
         };
 
-        // Call fetchInitialData when page loads
+        // Call fetchInitialData when the page loads
         fetchInitialData();
 
         // Calculate time 'til midnight
