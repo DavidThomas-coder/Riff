@@ -12,7 +12,7 @@ const HomePage = (props) => {
         submittedAnswer: "",
     });
     
-    // Define the state for other user's riffs
+    // Define the state for other user's riffss
     const [otherRiffs, setOtherRiffs] = useState([]);
     
     // Errors
