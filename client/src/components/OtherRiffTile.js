@@ -18,7 +18,7 @@ const OtherRiffTile = ({ riff, userId }) => {
             console.log("Username for user ID", userId, ":", data.user.username);
             setUsername(data.user.username);
         } catch (error) {
-            // If an error occurs while fetching the username, handle it gracefully
+            // If an error occurs while fetching the username, handle it 
             console.error("Error fetching the username:", error);
         }
         };
